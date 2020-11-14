@@ -1,3 +1,13 @@
+## v0.1.1
+
+Features:
+
+  - Added optional names for nic, ip_configuration and data disk objects
+
+Fixs:
+
+  - Fixed some objects names
+
 ## v0.1.0
 
 Features:

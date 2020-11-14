@@ -3,7 +3,7 @@
 # Network interfaces
 resource "azurerm_network_interface" "nic" {
   count                         = length(var.nics)
-  name                          = "${var.virtual_machine_name}-nic-${count.index}"
+  name                          = coalesce(var.nics[count.index].name,"${var.virtual_machine_name}-nic-${count.index}")
   location                      = var.location
   resource_group_name           = var.resource_group
   enable_ip_forwarding          = var.nics[count.index].enable_ip_forwarding
@@ -13,7 +13,7 @@ resource "azurerm_network_interface" "nic" {
     for_each = var.nics[count.index].ip_configurations
 
     content { 
-      name                          = ip_configuration.value["name"]
+      name                          = coalesce(ip_configuration.value["name"],"${var.virtual_machine_name}-ip-${count.index}")
       subnet_id                     = ip_configuration.value["subnet_id"]
       private_ip_address_allocation = ip_configuration.value["private_ip_address_allocation"]
       private_ip_address            = ip_configuration.value["private_ip_address"]
@@ -111,7 +111,7 @@ resource "azurerm_windows_virtual_machine" "vm-windows" {
 resource "azurerm_managed_disk" "vm-data-disk" {
   count                = length(var.data_disks) > 0 ? length(var.data_disks) : 0
 
-  name                 = "${var.virtual_machine_name}-datadisk-${var.data_disks[count.index]["data_disk_lun"]}"
+  name                 = coalesce(var.data_disks[count.index]["name"],"${var.virtual_machine_name}-datadisk-${count.index}")
   location             = var.location
   resource_group_name  = var.resource_group
   storage_account_type = var.data_disks[count.index]["data_disk_sa_type"]
@@ -122,10 +122,21 @@ resource "azurerm_managed_disk" "vm-data-disk" {
 }
 
 # Data disk association
+
+# Linux
 resource "azurerm_virtual_machine_data_disk_attachment" "data-disk2vm-linux" {
-  count = length(var.data_disks) > 0 ? length(var.data_disks) : 0
+  count = (length(var.data_disks) > 0) && !var.is_windows ? length(var.data_disks) : 0
   managed_disk_id = azurerm_managed_disk.vm-data-disk[count.index].id
-  virtual_machine_id = !var.is_windows ? azurerm_linux_virtual_machine.vm-linux[0].id : azurerm_windows_virtual_machine.vm-windows[0].id
+  virtual_machine_id = azurerm_linux_virtual_machine.vm-linux[0].id
+  lun     = var.data_disks[count.index]["data_disk_lun"]
+  caching = var.data_disks[count.index]["data_disk_caching"]
+}
+
+# Windows
+resource "azurerm_virtual_machine_data_disk_attachment" "data-disk2vm-windows" {
+  count = (length(var.data_disks) > 0) && var.is_windows ? length(var.data_disks) : 0
+  managed_disk_id = azurerm_managed_disk.vm-data-disk[count.index].id
+  virtual_machine_id = azurerm_windows_virtual_machine.vm-windows[0].id
   lun     = var.data_disks[count.index]["data_disk_lun"]
   caching = var.data_disks[count.index]["data_disk_caching"]
 }

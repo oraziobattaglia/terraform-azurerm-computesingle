@@ -64,6 +64,7 @@ variable "vm_os_version" {
 
 variable "nics" {
   type = list(object({
+    name                          = string
     enable_ip_forwarding          = bool
     enable_accelerated_networking = bool
     
@@ -100,6 +101,7 @@ variable "os_disk_size_gb" {
 
 variable "data_disks" {
   type = list(object({
+    name              = string
     data_disk_sa_type = string
     data_disk_caching = string
     data_disk_size_gb = number
