@@ -1,3 +1,9 @@
+## v0.1.2-dev
+
+Features:
+
+  - Added nic ids as output
+
 ## v0.1.1
 
 Features:
