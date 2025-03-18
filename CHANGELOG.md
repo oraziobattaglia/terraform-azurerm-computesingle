@@ -1,3 +1,9 @@
+## v0.1.3
+
+Fixes:
+
+ - Changed param names to be compatible with azure provider 4.x.x
+
 ## v0.1.2
 
 Features:
@@ -10,7 +16,7 @@ Features:
 
   - Added optional names for nic, ip_configuration and data disk objects
 
-Fixs:
+Fixes:
 
   - Fixed some objects names
 

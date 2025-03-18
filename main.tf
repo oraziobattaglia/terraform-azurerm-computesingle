@@ -2,12 +2,12 @@
 
 # Network interfaces
 resource "azurerm_network_interface" "nic" {
-  count                         = length(var.nics)
-  name                          = coalesce(var.nics[count.index].name,"${var.virtual_machine_name}-nic-${count.index}")
-  location                      = var.location
-  resource_group_name           = var.resource_group
-  enable_ip_forwarding          = var.nics[count.index].enable_ip_forwarding
-  enable_accelerated_networking = var.nics[count.index].enable_accelerated_networking
+  count                          = length(var.nics)
+  name                           = coalesce(var.nics[count.index].name,"${var.virtual_machine_name}-nic-${count.index}")
+  location                       = var.location
+  resource_group_name            = var.resource_group
+  ip_forwarding_enabled          = var.nics[count.index].enable_ip_forwarding
+  accelerated_networking_enabled = var.nics[count.index].enable_accelerated_networking
 
   dynamic ip_configuration {
     for_each = var.nics[count.index].ip_configurations
